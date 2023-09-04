@@ -14,5 +14,5 @@ Steps:
 ├── project1
 │ └── main.tf
 └── project2
-    └── main.tf
+  └── main.tf
 ```
