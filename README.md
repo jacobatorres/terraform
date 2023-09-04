@@ -7,6 +7,7 @@ Steps:
 3. Put the creds in the correct place in local (in the aws profile). 
 4. You can now create terraform code as usual (tfi; tfp; tfa). Note the structure.
 
+```
 ├── modules
 │ ├── lambda
 │ └── vpc
@@ -14,3 +15,4 @@ Steps:
 │ └── main.tf
 └── project2
     └── main.tf
+```
