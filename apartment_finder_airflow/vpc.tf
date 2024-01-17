@@ -219,6 +219,8 @@ resource "aws_db_instance" "tutorial_database" {
   db_subnet_group_name   = aws_db_subnet_group.tutorial_db_subnet_group.id
   vpc_security_group_ids = [aws_security_group.tutorial_db_sg.id]
   skip_final_snapshot    = true
+  multi_az               = false
+  max_allocated_storage  = 50
 
   publicly_accessible = true
 
