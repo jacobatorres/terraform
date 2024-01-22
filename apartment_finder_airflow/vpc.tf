@@ -238,22 +238,22 @@ resource "aws_key_pair" "tutorial_kp" {
 
 
 
-data "aws_ami" "ubuntu" {
-  most_recent = "true"
+# data "aws_ami" "ubuntu" {
+#   most_recent = "true"
 
-  filter {
-    name   = "name"
-    values = ["ubuntu/images/hvm-ssd/ubuntu-focal-20.04-amd64-server-*"]
+#   filter {
+#     name   = "name"
+#     values = ["ubuntu/images/hvm-ssd/ubuntu-focal-20.04-amd64-server-*"]
 
-  }
+#   }
 
-  filter {
-    name   = "virtualization-type"
-    values = ["hvm"]
-  }
+#   filter {
+#     name   = "virtualization-type"
+#     values = ["hvm"]
+#   }
 
-  owners = ["099720109477"]
-}
+#   owners = ["099720109477"]
+# }
 
 
 
@@ -284,10 +284,8 @@ resource "aws_instance" "tutorial_web" {
 
   count = 1
 
-  ami = data.aws_ami.ubuntu.id
-
-
-  instance_type = "t2.micro"
+  ami           = "ami-05d47d29a4c2d19e1"
+  instance_type = "r6g.medium"
 
   subnet_id = aws_subnet.tutorial_public_subnet[count.index].id
 
