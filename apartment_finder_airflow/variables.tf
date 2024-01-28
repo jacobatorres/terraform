@@ -103,22 +103,13 @@ variable "project_name" {
 }
 
 
+variable "app_token_password" {
+  default = ""
+}
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+variable "data_lacity_password" {
+  default = ""
+}
 
 
 

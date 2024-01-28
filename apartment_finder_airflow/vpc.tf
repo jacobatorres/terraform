@@ -209,7 +209,7 @@ resource "aws_db_subnet_group" "tutorial_db_subnet_group" {
 
 resource "aws_db_instance" "tutorial_database" {
 
-  allocated_storage      = 10
+  allocated_storage      = 100
   engine                 = "postgres"
   engine_version         = "14.10"
   instance_class         = "db.t3.micro"
@@ -220,7 +220,6 @@ resource "aws_db_instance" "tutorial_database" {
   vpc_security_group_ids = [aws_security_group.tutorial_db_sg.id]
   skip_final_snapshot    = true
   multi_az               = false
-  max_allocated_storage  = 50
 
   publicly_accessible = true
 
