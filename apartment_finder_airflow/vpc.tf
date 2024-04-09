@@ -158,7 +158,7 @@ resource "aws_security_group" "tutorial_db_sg" {
     from_port   = "5432"
     to_port     = "5432"
     protocol    = "tcp"
-    cidr_blocks = ["45.48.40.241/32"]
+    cidr_blocks = ["${var.my_ip}/32"]
   }
 
   egress {
