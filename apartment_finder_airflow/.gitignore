@@ -1,6 +1,8 @@
-secrets.tfvars
-terraform.tfstate
-terraform.tfstate.backup
+examples/basic/secrets.tfvars
+examples/basic/terraform.tfstate
+examples/basic/terraform.tfstate.backup
 .terraform/
-tutorial_kp
-theplan
+examples/basic/.terraform/
+examples/basic/tutorial_kp
+examples/basic/theplan
+examples/basic/theplan2

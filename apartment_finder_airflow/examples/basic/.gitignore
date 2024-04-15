@@ -1,0 +1,7 @@
+secrets.tfvars
+terraform.tfstate
+terraform.tfstate.backup
+.terraform/
+tutorial_kp
+theplan
+theplan2

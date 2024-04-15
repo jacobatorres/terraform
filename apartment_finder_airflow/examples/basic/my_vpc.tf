@@ -1,97 +1,88 @@
 //VPC
 
-resource "aws_vpc" "tutorial_vpc" {
-  cidr_block           = var.vpc_cidr_block
-  enable_dns_hostnames = true
-
-  tags = {
-    Name = var.project_name
-  }
-
-}
-
+# created in main.tf
 
 // internet gateway
 
-resource "aws_internet_gateway" "tutorial_igw" {
+# resource "aws_internet_gateway" "tutorial_igw" {
 
-  vpc_id = aws_vpc.tutorial_vpc.id
+#   vpc_id = module.vpc.vpc_id
 
-  tags = {
-    Name = var.project_name
-  }
+#   tags = {
+#     Name = var.project_name
+#   }
 
-}
-
-
-
-resource "aws_subnet" "tutorial_public_subnet" {
-  count             = var.subnet_count.public
-  vpc_id            = aws_vpc.tutorial_vpc.id
-  cidr_block        = var.public_subnet_cidr_blocks[count.index]
-  availability_zone = data.aws_availability_zones.available.names[count.index]
-
-
-  tags = {
-    Name = var.project_name
-  }
-
-}
-
-
-resource "aws_subnet" "tutorial_private_subnet" {
-
-  count             = var.subnet_count.private
-  vpc_id            = aws_vpc.tutorial_vpc.id
-  cidr_block        = var.private_subnet_cidr_blocks[count.index]
-  availability_zone = data.aws_availability_zones.available.names[count.index]
-
-
-  tags = {
-    Name = var.project_name
-  }
-}
-
-
-resource "aws_route_table" "tutorial_public_rt" {
-  vpc_id = aws_vpc.tutorial_vpc.id
-
-  route {
-    cidr_block = "0.0.0.0/0"
-    gateway_id = aws_internet_gateway.tutorial_igw.id
-  }
-}
-
-
-resource "aws_route_table_association" "public" {
-
-  count          = var.subnet_count.public
-  route_table_id = aws_route_table.tutorial_public_rt.id
-  subnet_id      = aws_subnet.tutorial_public_subnet[count.index].id
-
-}
+# }
 
 
 
-
-resource "aws_route_table" "tutorial_private_ip" {
-  vpc_id = aws_vpc.tutorial_vpc.id
-
-  route {
-    cidr_block = "0.0.0.0/0"
-    gateway_id = aws_internet_gateway.tutorial_igw.id
-  }
-
-}
+# resource "aws_subnet" "tutorial_public_subnet" {
+#   count             = var.subnet_count.public
+#   vpc_id            = module.vpc.vpc_id
+#   cidr_block        = var.public_subnet_cidr_blocks[count.index]
+#   availability_zone = data.aws_availability_zones.available.names[count.index]
 
 
-resource "aws_route_table_association" "private" {
+#   tags = {
+#     Name = var.project_name
+#   }
 
-  count          = var.subnet_count.private
-  route_table_id = aws_route_table.tutorial_private_ip.id
-  subnet_id      = aws_subnet.tutorial_private_subnet[count.index].id
+# }
 
-}
+
+# resource "aws_subnet" "tutorial_private_subnet" {
+
+#   count             = var.subnet_count.private
+#   vpc_id            = module.vpc.vpc_id
+#   cidr_block        = var.private_subnet_cidr_blocks[count.index]
+#   availability_zone = data.aws_availability_zones.available.names[count.index]
+
+
+#   tags = {
+#     Name = var.project_name
+#   }
+# }
+
+
+# resource "aws_route_table" "tutorial_public_rt" {
+#   vpc_id = module.vpc.vpc_id
+
+#   route {
+#     cidr_block = "0.0.0.0/0"
+#     gateway_id = aws_internet_gateway.tutorial_igw.id
+#   }
+# }
+
+
+# resource "aws_route_table_association" "public" {
+
+#   count          = var.subnet_count.public
+#   route_table_id = aws_route_table.tutorial_public_rt.id
+#   subnet_id      = aws_subnet.tutorial_public_subnet[count.index].id
+
+# }
+
+
+
+
+# resource "aws_route_table" "tutorial_private_ip" {
+#   vpc_id = module.vpc.vpc_id
+
+#   route {
+#     cidr_block = "0.0.0.0/0"
+#     gateway_id = aws_internet_gateway.tutorial_igw.id
+#   }
+
+# }
+
+
+# resource "aws_route_table_association" "private" {
+
+#   count          = var.subnet_count.private
+#   route_table_id = aws_route_table.tutorial_private_ip.id
+#   subnet_id      = aws_subnet.tutorial_private_subnet[count.index].id
+
+# }
 
 
 
@@ -99,15 +90,7 @@ resource "aws_security_group" "tutorial_web_sg" {
 
   name        = "tutorial_web_sg"
   description = "SG for web server"
-  vpc_id      = aws_vpc.tutorial_vpc.id
-
-  ingress {
-    description = "allow all traffic thru http"
-    from_port   = "80"
-    to_port     = "80"
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
+  vpc_id      = module.vpc.vpc_id
 
 
   ingress {
@@ -116,6 +99,14 @@ resource "aws_security_group" "tutorial_web_sg" {
     to_port     = "22"
     protocol    = "tcp"
     cidr_blocks = ["${var.my_ip}/32"]
+  }
+
+  ingress {
+    description = "allow all in traffic"
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
   }
 
   egress {
@@ -142,10 +133,10 @@ resource "aws_security_group" "tutorial_db_sg" {
   name        = "tutorial_db_sg"
   description = "SG for the rds"
 
-  vpc_id = aws_vpc.tutorial_vpc.id
+  vpc_id = module.vpc.vpc_id
 
   ingress {
-    description     = "allow postgres traffic only from the web sg"
+    description     = "allow postgres traffic from the web sg"
     from_port       = "5432"
     to_port         = "5432"
     protocol        = "tcp"
@@ -154,12 +145,21 @@ resource "aws_security_group" "tutorial_db_sg" {
 
 
   ingress {
-    description = "allow postgres traffic only from my ip"
+    description = "allow postgres traffic from my ip"
     from_port   = "5432"
     to_port     = "5432"
     protocol    = "tcp"
     cidr_blocks = ["${var.my_ip}/32"]
   }
+
+  ingress {
+    description     = "allow postgres traffic from airflow"
+    from_port       = "5432"
+    to_port         = "5432"
+    protocol        = "tcp"
+    security_groups = [module.mwaa.mwaa_security_group_id]
+  }
+
 
   egress {
     description = "allow all outbound traffic"
@@ -181,8 +181,16 @@ resource "aws_security_group" "tutorial_db_sg" {
 resource "aws_db_subnet_group" "tutorial_db_subnet_group" {
   name        = "tutorial_db_subnet_group"
   description = "db subnet group"
-  subnet_ids  = [for subnet in aws_subnet.tutorial_private_subnet : subnet.id]
+  subnet_ids  = module.vpc.private_subnets
 }
+
+
+resource "aws_db_subnet_group" "tutorial_db_subnet_group_public" {
+  name        = "tutorial_db_subnet_group_public"
+  description = "db subnet groupp public"
+  subnet_ids  = module.vpc.public_subnets
+}
+
 
 # variable "rds_ec2_settings" {
 #   description = "Config settings"
@@ -216,7 +224,7 @@ resource "aws_db_instance" "tutorial_database" {
   db_name                = "tutorial"
   username               = var.db_username
   password               = var.db_password
-  db_subnet_group_name   = aws_db_subnet_group.tutorial_db_subnet_group.id
+  db_subnet_group_name   = aws_db_subnet_group.tutorial_db_subnet_group_public.id
   vpc_security_group_ids = [aws_security_group.tutorial_db_sg.id]
   skip_final_snapshot    = true
   multi_az               = false
@@ -286,7 +294,7 @@ resource "aws_instance" "tutorial_web" {
   ami           = "ami-05d47d29a4c2d19e1"
   instance_type = "r6g.medium"
 
-  subnet_id = aws_subnet.tutorial_public_subnet[count.index].id
+  subnet_id = module.vpc.public_subnets[count.index]
 
 
   key_name = aws_key_pair.tutorial_kp.key_name

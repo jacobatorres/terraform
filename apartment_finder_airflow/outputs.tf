@@ -1,33 +1,40 @@
-output "web_public_ip" {
-
-  description = "public ip address of the web server"
-
-  value = aws_eip.tutorial_web_eip[0].public_ip
-
-  depends_on = [aws_eip.tutorial_web_eip]
-
+output "mwaa_webserver_url" {
+  description = "The webserver URL of the MWAA Environment"
+  value       = aws_mwaa_environment.mwaa.webserver_url
 }
 
-
-output "web_public_dns" {
-  description = "public dns of the web server "
-
-
-  value = aws_eip.tutorial_web_eip[0].public_dns
-
-  depends_on = [aws_eip.tutorial_web_eip]
+output "mwaa_arn" {
+  description = "The ARN of the MWAA Environment"
+  value       = aws_mwaa_environment.mwaa.arn
 }
 
-
-
-output "database_endpoint" {
-  description = "endpoint of the db"
-  value       = aws_db_instance.tutorial_database.address
+output "mwaa_service_role_arn" {
+  description = "The Service Role ARN of the Amazon MWAA Environment"
+  value       = aws_mwaa_environment.mwaa.service_role_arn
 }
 
-
-
-output "database_port" {
-  description = "port of the db"
-  value       = aws_db_instance.tutorial_database.port
+output "mwaa_status" {
+  description = "The status of the Amazon MWAA Environment"
+  value       = aws_mwaa_environment.mwaa.status
 }
+
+output "mwaa_role_arn" {
+  description = "IAM Role ARN of the MWAA Environment"
+  value       = var.execution_role_arn == null ? aws_iam_role.mwaa[0].arn : ""
+}
+
+output "mwaa_role_name" {
+  description = "IAM role name of the MWAA Environment"
+  value       = var.execution_role_arn == null ? aws_iam_role.mwaa[0].id : ""
+}
+
+output "mwaa_security_group_id" {
+  description = "Security group id of the MWAA Environment"
+  value       = var.create_security_group == true ? aws_security_group.mwaa[0].id : ""
+}
+
+output "aws_s3_bucket_name" {
+  description = "S3 bucket Name of the MWAA Environment"
+  value       = var.source_bucket_arn == null ? aws_s3_bucket.mwaa[0].id : ""
+}
+
