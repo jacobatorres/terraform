@@ -11,6 +11,16 @@ variable "private_subnet_ids" {
   type        = list(string)
 }
 
+variable "list_of_secret_arns" {
+  description = "list of secret arns"
+  type        = list(string)
+}
+
+variable "rds_arn" {
+  description = "rds arn"
+  type        = string
+}
+
 variable "airflow_configuration_options" {
   description = "(Optional) The airflow_configuration_options parameter specifies airflow override options."
   type        = any

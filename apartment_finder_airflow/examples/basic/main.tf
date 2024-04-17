@@ -82,8 +82,8 @@ module "mwaa" {
   dag_s3_path       = "dags"
 
   ## If uploading requirements.txt or plugins, you can enable these via these options
-  #plugins_s3_path      = "plugins.zip"
-  #requirements_s3_path = "requirements.txt"
+  # plugins_s3_path      = "plugins.zip"
+  requirements_s3_path = "requirements.txt"
 
   logging_configuration = {
     dag_processing_logs = {
@@ -126,6 +126,8 @@ module "mwaa" {
 
   webserver_access_mode = "PUBLIC_ONLY"   # Choose the Private network option(PRIVATE_ONLY) if your Apache Airflow UI is only accessed within a corporate network, and you do not require access to public repositories for web server requirements installation
   source_cidr           = ["10.1.0.0/16"] # Add your IP address to access Airflow UI
+  list_of_secret_arns   = [aws_secretsmanager_secret.app_token.arn, aws_secretsmanager_secret.data_lacity_pw.arn, aws_secretsmanager_secret.psql_pw.arn]
+  rds_arn               = aws_db_instance.tutorial_database.arn
 
   tags = var.tags
 

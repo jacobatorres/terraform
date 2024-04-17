@@ -162,4 +162,24 @@ data "aws_iam_policy_document" "mwaa" {
     actions   = ["cloudwatch:*"]
     resources = ["arn:${data.aws_partition.current.id}:logs:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:log-group:/aws/lambda/*"]
   }
+
+  statement {
+    effect = "Allow"
+    actions = [
+      "secretsmanager:GetResourcePolicy",
+      "secretsmanager:GetSecretValue",
+      "secretsmanager:DescribeSecret",
+      "secretsmanager:ListSecretVersionIds"
+    ]
+    resources = var.list_of_secret_arns
+  }
+
+  statement {
+    effect = "Allow"
+    actions = [
+      "rds:DescribeDBInstances",
+      "rds:*"
+    ]
+    resources = [var.rds_arn, "arn:aws:rds:us-east-1:090967155814:db:*"]
+  }
 }

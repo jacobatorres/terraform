@@ -1,1 +1,6 @@
 boto3
+botocore
+sodapy
+pandas
+psycopg2-binary
+psycopg2==2.9.3
