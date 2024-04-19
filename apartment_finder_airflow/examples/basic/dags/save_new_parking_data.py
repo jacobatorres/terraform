@@ -22,6 +22,17 @@ data_code_dictionary = {
 
 }
 
+def run_sql(conn, sql_to_run, params = ()):
+    try:
+        cur = conn.cursor()
+        cur.execute(sql_to_run, params)
+        conn.commit()
+    except Exception as e:
+        print("Error when running the sql: {}".format(e))
+        conn.rollback()
+        return e
+
+
 
 def get_secret(secret_name, region):
     print("Getting secret {} from {}".format(secret_name, region))
@@ -120,6 +131,35 @@ def save_new_parking_data_to_postgres(*args, **kwargs):
     print("ok3")
     conn = connect_to_psql_db(psql_password)
     print("ok4")
+
+
+    mini_counter = 0 
+    while mini_counter < 10:
+        print(mini_counter)
+        try:
+            print("asd")
+            print(results_df_2.loc[mini_counter])
+            space_id = results_df_2.loc[mini_counter]['spaceid']
+            event_time = results_df_2.loc[mini_counter]['eventtime']
+            occupancy_state = results_df_2.loc[mini_counter]['occupancystate']
+            print(space_id)
+            print(event_time)
+            print(event_time)
+            # save data
+            print("nice")
+
+            insert_sql_statement = "INSERT INTO parking_real_time (space_id, event_time, occupancy_state) VALUES (%s, %s, %s);"
+            params = (space_id, event_time, occupancy_state)
+            run_sql(conn, insert_sql_statement, params)
+            print("done")
+
+        except Exception as e:
+            print("Skipping, error when parsing this value")
+
+        mini_counter += 1
+
+
+
 
 
 
