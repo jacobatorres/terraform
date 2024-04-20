@@ -112,64 +112,73 @@ def connect_to_psql_db(psql_password):
 
     return conn
 
-def get_data_from_la_city(client, url_suffix, limit, offset):
-    return client.get(url_suffix, limit = limit, offset = offset)
+def get_data_from_la_city(client, url_suffix, limit, offset, orderby):
+    return client.get(url_suffix, limit = limit, offset = offset, order = orderby)
 
 def save_new_parking_data_to_postgres(*args, **kwargs):
-    print("Hello from PythonOperator. Getting secret... ")
     app_val_token = get_secret("app_token_value", "us-east-1")
     lacity_password = get_secret("data_lacity_password_value", "us-east-1")
-    print("ok1")
     client = connect_to_la_city_api(app_val_token, lacity_password)
-    print("ok2")
 
-    parking_rt_results = get_data_from_la_city(client, data_code_dictionary['parking_spot_realtime'][0], 10, 0)
-    results_df_2 = pd.DataFrame.from_records(parking_rt_results)
-    print(results_df_2)
-    
     psql_password = get_secret("psql_password_value", "us-east-1")
-    print("ok3")
     conn = connect_to_psql_db(psql_password)
-    print("ok4")
+
+    limit_value = 50
+    # get data up until 5 mins ago
+    exit_flag = True
+    while exit_flag:
+
+        for offsetval in range(0, 3000, limit_value):
+            print("limit is {}, offsetval is {}".format(limit_value, offsetval))
+            parking_rt_results = get_data_from_la_city(client, data_code_dictionary['parking_spot_realtime'][0], limit_value, offsetval, "eventtime DESC")
+            results_df_2 = pd.DataFrame.from_records(parking_rt_results)
+
+            mini_counter = 0
+
+            while mini_counter < limit_value:
+                try:
+                    space_id = results_df_2.loc[mini_counter]['spaceid']
+                    event_time = results_df_2.loc[mini_counter]['eventtime']
+                    occupancy_state = results_df_2.loc[mini_counter]['occupancystate']
+
+                    date_obj = datetime.strptime(event_time, '%Y-%m-%dT%H:%M:%S.%f')
+                    date_now = datetime.utcnow()
+
+                    diff = date_now - date_obj
+
+                    if diff.total_seconds() > 300:
+                        print("ok, data is older than 5 mins, exiting")
+                        exit_flag = False
+                        break
+
+                    insert_sql_statement = "INSERT INTO parking_real_time (space_id, event_time, occupancy_state) VALUES (%s, %s, %s);"
+                    params = (space_id, event_time, occupancy_state)
+                    run_sql(conn, insert_sql_statement, params)
+
+                except Exception as e:
+                    print("Skipping, error when parsing this value")
+                    print(e)
+
+                mini_counter += 1
+
+            print("last data timestamp" + event_time)
+
+            if exit_flag == False:
+                break
 
 
-    mini_counter = 0 
-    while mini_counter < 10:
-        print(mini_counter)
-        try:
-            print("asd")
-            print(results_df_2.loc[mini_counter])
-            space_id = results_df_2.loc[mini_counter]['spaceid']
-            event_time = results_df_2.loc[mini_counter]['eventtime']
-            occupancy_state = results_df_2.loc[mini_counter]['occupancystate']
-            print(space_id)
-            print(event_time)
-            print(event_time)
-            # save data
-            print("nice")
-
-            insert_sql_statement = "INSERT INTO parking_real_time (space_id, event_time, occupancy_state) VALUES (%s, %s, %s);"
-            params = (space_id, event_time, occupancy_state)
-            run_sql(conn, insert_sql_statement, params)
-            print("done")
-
-        except Exception as e:
-            print("Skipping, error when parsing this value")
-
-
-        mini_counter += 1
     print("finished")
-
-    print(datetime.now())
 
 
 
 
 #schedule = */2 * * * * (every two mins)
 
-with DAG('save_parking_data_dag_conn1', start_date=datetime(2024, 4, 19), schedule_interval='*/10 * * * *') as dag:
+with DAG('save_parking_data_dag_conn1', start_date=datetime(2024, 4, 19), schedule_interval='*/5 * * * *') as dag:
     python_task = PythonOperator(
         task_id='python_task_save_new_parking_data',
         python_callable=save_new_parking_data_to_postgres
     )
+
+
 
