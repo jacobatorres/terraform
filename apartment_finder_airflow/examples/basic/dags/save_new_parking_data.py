@@ -156,16 +156,18 @@ def save_new_parking_data_to_postgres(*args, **kwargs):
         except Exception as e:
             print("Skipping, error when parsing this value")
 
+
         mini_counter += 1
+    print("finished")
 
-
+    print(datetime.now())
 
 
 
 
 #schedule = */2 * * * * (every two mins)
 
-with DAG('save_parking_data_dag_conn1', start_date=datetime(2021, 1, 1)) as dag:
+with DAG('save_parking_data_dag_conn1', start_date=datetime(2024, 4, 19), schedule_interval='*/10 * * * *') as dag:
     python_task = PythonOperator(
         task_id='python_task_save_new_parking_data',
         python_callable=save_new_parking_data_to_postgres
