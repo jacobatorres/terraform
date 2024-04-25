@@ -2,8 +2,8 @@ This is the terraform code that creates the infrastructure of the application. I
 
 The important parts of the infrastructure are:
 
-- Airflow / MWAA resource. This populates one of the tables in the database (parking_real_time)
-- EC2 instance. This is where the application is hosted, and why we can access the application via http://3.209.240.80:8000/. This also requests data to the RDS, needed when providing the nearest points. We can also use this to run the adhoc scripts to populate some of the tables in the database.
+- Airflow / MWAA resource. This populates one of the tables in the database (parking_real_time).
+- EC2 instance. This is where the application is hosted, and why we can access the application via http://3.209.240.80:8000/. This also requests data to the RDS, needed when providing the nearest points. We can also use this to run the adhoc scripts to populate some of the tables in the database (business_location and parking_location).
 - RDS instance. This is the postgresql database where the data is stored.
 
 <img src="readme_pics/architecture.jpg" alt="drawing" width="700"/>
