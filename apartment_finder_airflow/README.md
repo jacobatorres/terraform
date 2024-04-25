@@ -1,8 +1,8 @@
-This is the terraform code that creates the infrastructure of the application. I suggest reading the README found in https://github.com/jacobatorres/los_angeles_parking_finder/blob/main/README.md for more context on the resource created.
+This is the terraform code that creates the infrastructure of the application. I suggest reading the README found in https://github.com/jacobatorres/los_angeles_parking_finder/blob/main/README.md for more context on the resources created.
 
 The important parts of the infrastructure are:
 
-- Airflow / MWAA resource. This populates one of the tables in the database (parking_real_time).
+- Airflow / MWAA. This populates one of the tables in the database (parking_real_time).
 - EC2 instance. This is where the application is hosted, and why we can access the application via http://3.209.240.80:8000/. This also requests data to the RDS, needed when providing the nearest points. We can also use this to run the adhoc scripts to populate some of the tables in the database (business_location and parking_location).
 - RDS instance. This is the postgresql database where the data is stored.
 
@@ -11,7 +11,7 @@ The important parts of the infrastructure are:
 
 To create the infrastructure: git clone this repo, then go to github_repos/terraform/apartment_finder_airflow/examples/basic. Then go to github_repos/terraform/apartment_finder_airflow/examples/basic. Then run `terraform init; terraform plan -out theplan -var-file="secrets.tfvars"; terraform apply theplan`
 
-the terraform will ask for your machine's local IP address, you can put that in the secrets.tfvars file. Here's what my secrets.tfvars looked like:
+the terraform will ask for your machine's local IP address, you can put that in the secrets.tfvars file. Here's what my secrets.tfvars looked like, please populate as needed. For the app_token_password and data_lacity_password, you would need to create an account in the https://data.lacity.org/login. Then the password part is for data_lacity_password. Once logged in, create an API key. the app_token_part is needed to access their API.
 
 	```
 	app_token_password   = "<REDACTED>"
