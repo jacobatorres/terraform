@@ -1,42 +1,24 @@
-README
+This is the terraform code that creates the infrastructure of the application. I suggest reading the README found in https://github.com/jacobatorres/los_angeles_parking_finder/blob/main/README.md for more context on the resource created.
 
-- this app uses Airflow to scrape data, then provides this data in a website to show the best areas in Los Angeles based on Parking Data and Crime
- 
-- scrape Parking Data -> Clean it up -> get Lat Long of data (if not available) -> save data in DB
-- scrape Crime Data -> Clean it up -> get Lat Long of data (if not available) -> save data in DB
-- scrape median income Data -> Clean it up -> 
-- merge data into a filterable map. Via Hexbin or Leaflet
+The important parts of the infrastructure are:
 
-- airflow 
+- Airflow / MWAA resource. This populates one of the tables in the database (parking_real_time)
+- EC2 instance. This is where the application is hosted, and why we can access the application via http://3.209.240.80:8000/. This also requests data to the RDS, needed when providing the nearest points. We can also use this to run the adhoc scripts to populate some of the tables in the database.
+- RDS instance. This is the postgresql database where the data is stored.
 
-
-this quarter
-lets do it by hand
+<img src="readme_pics/architecture.jpeg" alt="drawing" width="700"/>
 
 
-quick and dirty
-- get parking data -> clean it up -> save it in a postgres SQL in DB -> 
+To create the infrastructure: git clone this repo, then go to github_repos/terraform/apartment_finder_airflow/examples/basic. Then go to github_repos/terraform/apartment_finder_airflow/examples/basic. Then run `terraform init; terraform plan -out theplan -var-file="secrets.tfvars"; terraform apply theplan`
 
-- save everything to a table, be able to determine the top cities based on parking, crime
+the terraform will ask for your machine's local IP address, you can put that in the secrets.tfvars file. Here's what my secrets.tfvars looked like:
 
-- go to a website, opionate
-
-
-VPC
-ec2 instance (has airflow)
-
-
-good: no terraform
-great: with terraform
-
-
-read up on airflow
-learn how to do airflow in terraform (mwaa)
-add basic script in mwaa
-kill using terraform ! save money
-think of how to do the scraping via airflow
-create terraform for postgres, other stuff for the project
-
-
+	```
+	app_token_password   = "<REDACTED>"
+	data_lacity_password = "<REDACTED>"
+	db_username          = "<REDACTED>"
+	db_password          = "<REDACTED>"
+	my_ip                = "<REDACTED>"
+	```
 
 

@@ -103,9 +103,9 @@ resource "aws_security_group" "tutorial_web_sg" {
 
   ingress {
     description = "allow all in traffic"
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
+    from_port   = 8000
+    to_port     = 8000
+    protocol    = "TCP"
     cidr_blocks = ["0.0.0.0/0"]
   }
 
