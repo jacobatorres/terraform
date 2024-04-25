@@ -6,7 +6,7 @@ The important parts of the infrastructure are:
 - EC2 instance. This is where the application is hosted, and why we can access the application via http://3.209.240.80:8000/. This also requests data to the RDS, needed when providing the nearest points. We can also use this to run the adhoc scripts to populate some of the tables in the database.
 - RDS instance. This is the postgresql database where the data is stored.
 
-<img src="readme_pics/architecture.jpeg" alt="drawing" width="700"/>
+<img src="readme_pics/architecture.jpg" alt="drawing" width="700"/>
 
 
 To create the infrastructure: git clone this repo, then go to github_repos/terraform/apartment_finder_airflow/examples/basic. Then go to github_repos/terraform/apartment_finder_airflow/examples/basic. Then run `terraform init; terraform plan -out theplan -var-file="secrets.tfvars"; terraform apply theplan`
